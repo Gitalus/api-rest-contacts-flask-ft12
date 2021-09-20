@@ -1,7 +1,8 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from flask_migrate import Migrate
 from flask_cors import CORS
 from models import db, User
+import json
 
 app = Flask(__name__)
 app.url_map.slashes = False
@@ -25,6 +26,16 @@ def get_users():
     users = list(map(lambda user: user.serialize(), users))
 
     return jsonify(users), 200
+
+@app.route('/api/users', methods=['POST'])
+def post_user():
+    
+    request_body = request.data
+    decoded_object = json.loads(request_body)
+    newUser = User(**decoded_object)
+    newUser.save()
+
+    return jsonify({ "msg": "success"}), 200
 
 
 if __name__ == '__main__':
